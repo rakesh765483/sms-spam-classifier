@@ -4,29 +4,29 @@ import string
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
-import os
 
-# Ensure NLTK data is available in Streamlit Cloud
-nltk_data_dir = os.path.join(os.getcwd(), "nltk_data")
-if not os.path.exists(nltk_data_dir):
-    os.mkdir(nltk_data_dir)
-
-nltk.data.path.append(nltk_data_dir)
-
-# Download necessary resources if missing
-nltk.download('punkt', download_dir=nltk_data_dir)
-nltk.download('stopwords', download_dir=nltk_data_dir)
+# --- Ensure NLTK punkt and stopwords are available ---
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
+try:
+    nltk.data.find('corpora/stopwords')
+except LookupError:
+    nltk.download('stopwords')
 
 ps = PorterStemmer()
 
 # Function to preprocess text
 def transform_text(text):
+    # Lowercase
     text = text.lower()
+    # Tokenization
     text = nltk.word_tokenize(text)
 
     y = []
     for i in text:
-        if i.isalnum():  # ✅ Fixed function call
+        if i.isalnum():
             y.append(i)
 
     text = y[:]
@@ -44,7 +44,6 @@ def transform_text(text):
 
     return " ".join(y)
 
-
 # Load pre-trained vectorizer and model
 tfidf = pickle.load(open('vectorizer.pkl', 'rb'))
 model = pickle.load(open('model.pkl', 'rb'))
@@ -52,7 +51,7 @@ model = pickle.load(open('model.pkl', 'rb'))
 # Streamlit App
 st.title("📩 Email/SMS Spam Classifier")
 
-input_sms = st.text_area("Enter the message")  # ✅ text_area allows multiline input
+input_sms = st.text_area("Enter the message")
 
 if st.button('Predict'):
     if input_sms.strip() == "":
@@ -70,4 +69,6 @@ if st.button('Predict'):
             st.error("🚨 Spam Message Detected!")
         else:
             st.success("✅ This message is NOT spam.")
+
+
 
