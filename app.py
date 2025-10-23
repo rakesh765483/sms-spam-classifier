@@ -4,13 +4,20 @@ import string
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
+import os
 
-# Initialize stemmer
+# Ensure NLTK data is available in Streamlit Cloud
+nltk_data_dir = os.path.join(os.getcwd(), "nltk_data")
+if not os.path.exists(nltk_data_dir):
+    os.mkdir(nltk_data_dir)
+
+nltk.data.path.append(nltk_data_dir)
+
+# Download necessary resources if missing
+nltk.download('punkt', download_dir=nltk_data_dir)
+nltk.download('stopwords', download_dir=nltk_data_dir)
+
 ps = PorterStemmer()
-
-# Ensure required NLTK data is available
-nltk.download('punkt')
-nltk.download('stopwords')
 
 # Function to preprocess text
 def transform_text(text):
@@ -63,3 +70,4 @@ if st.button('Predict'):
             st.error("🚨 Spam Message Detected!")
         else:
             st.success("✅ This message is NOT spam.")
+
